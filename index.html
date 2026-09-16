@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>健康狀況與身體數據填寫</title>
+  <!-- 引入 LINE LIFF SDK -->
+  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    body {
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 16px;
+      font-size: 20px; /* 大字體基礎設定 */
+      color: #222;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    h2 {
+      color: #1b5e20;
+      font-size: 24px;
+      margin-top: 0;
+      border-bottom: 3px solid #81c784;
+      padding-bottom: 8px;
+    }
+    .sub-title {
+      font-size: 18px;
+      color: #555;
+      margin-bottom: 16px;
+    }
+    /* 大按鈕複選框 (Checkbox Grid) */
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .checkbox-btn {
+      position: relative;
+    }
+    .checkbox-btn input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .checkbox-label {
+      display: block;
+      background-color: #f0f4f8;
+      border: 2px solid #b0bec5;
+      border-radius: 12px;
+      padding: 14px 10px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      color: #333;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s;
+    }
+    /* 勾選時的樣式 (深綠色高對比) */
+    .checkbox-btn input[type="checkbox"]:checked + .checkbox-label {
+      background-color: #2e7d32;
+      color: #ffffff;
+      border-color: #1b5e20;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    /* 無病史專用按鈕 */
+    .none-btn .checkbox-label {
+      background-color: #fff3e0;
+      border-color: #ffb74d;
+      color: #e65100;
+      grid-column: span 2;
+    }
+    .none-btn input[type="checkbox"]:checked + .checkbox-label {
+      background-color: #e65100;
+      color: #ffffff;
+      border-color: #b71c1c;
+    }
+
+    /* 輸入框樣式 */
+    .form-group {
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
+      font-size: 20px;
+    }
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 14px;
+      font-size: 22px;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      outline: none;
+      background-color: #fafafa;
+    }
+    input:focus {
+      border-color: #2e7d32;
+      background-color: #fff;
+    }
+    .unit-input {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .unit-input input {
+      flex: 1;
+    }
+    .unit-text {
+      font-size: 18px;
+      font-weight: bold;
+      color: #666;
+    }
+
+    /* 提交按鈕 (超大綠色按鈕) */
+    .submit-btn {
+      width: 100%;
+      background-color: #00c853;
+      color: white;
+      border: none;
+      border-radius: 16px;
+      padding: 18px;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0,200,83,0.4);
+      margin-top: 10px;
+      margin-bottom: 40px;
+    }
+    .submit-btn:active {
+      background-color: #009624;
+      transform: scale(0.98);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 第一部分：個人病史 -->
+  <div class="card">
+    <h2>一、 本人醫療病史</h2>
+    <div class="sub-title">請點選您目前的健康狀況（可多選）：</div>
+    <div class="checkbox-grid">
+      <div class="checkbox-btn none-btn" style="grid-column: span 2;">
+        <input type="checkbox" id="disease-0" value="無" onchange="toggleNone(this)">
+        <label for="disease-0" class="checkbox-label">👉 以上皆無</label>
+      </div>
+
+      <div class="checkbox-btn"><input type="checkbox" class="disease-item" id="d1" value="高血壓"><label for="d1" class="checkbox-label">高血壓</label></div>
+      <div class="checkbox-btn"><input type="checkbox" class="disease-item" id="d2" value="糖尿病"><label for="d2" class="checkbox-label">糖尿病</label></div>
+      <div class="checkbox-btn"><input type="checkbox" class="disease-item" id="d3" value="腎臟病"><label for="d3" class="checkbox-label">腎臟病</label></div>
+      <div class="checkbox-btn"><input type="checkbox" class="disease-item" id="d4" value="缺血性心臟病"><label for="d4" class="checkbox-label">缺血性心臟病</label></div>
+      <div class="checkbox-btn"><input type="checkbox" class="disease-item" id="d5" value="心律不整"><label for="d5" class="checkbox-label">心律不整</label></div>
+      <div class="checkbox-btn"><input type="checkbox" class="disease-item" id="d6" value="心臟衰竭"><label for="d6" class="checkbox-label">心臟衰竭</label></div>
+      <div class="checkbox-btn"><input type="checkbox" class="disease-item" id="d7" value="腦血管疾病"><label for="d7" class="checkbox-label">腦血管疾病</label></div>
+      <div class="checkbox-btn"><input type="checkbox" class="disease-item" id="d8" value="腫瘤"><label for="d8" class="checkbox-label">腫瘤</label></div>
+      <div class="checkbox-btn"><input type="checkbox" class="disease-item" id="d9" value="貧血"><label for="d9" class="checkbox-label">貧血</label></div>
+      <div class="checkbox-btn"><input type="checkbox" class="disease-item" id="d10" value="關節炎"><label for="d10" class="checkbox-label">關節炎</label></div>
+      <div class="checkbox-btn"><input type="checkbox" class="disease-item" id="d11" value="高膽固醇血症"><label for="d11" class="checkbox-label">高膽固醇血症</label></div>
+      <div class="checkbox-btn"><input type="checkbox" class="disease-item" id="d12" value="痛風/高尿酸"><label for="d12" class="checkbox-label">痛風/高尿酸</label></div>
+      <div class="checkbox-btn"><input type="checkbox" class="disease-item" id="d13" value="過敏性鼻炎"><label for="d13" class="checkbox-label">過敏性鼻炎</label></div>
+      <div class="checkbox-btn"><input type="checkbox" class="disease-item" id="d14" value="氣喘"><label for="d14" class="checkbox-label">氣喘</label></div>
+      <div class="checkbox-btn"><input type="checkbox" class="disease-item" id="d15" value="慢性肺疾病"><label for="d15" class="checkbox-label">慢性肺疾病</label></div>
+      <div class="checkbox-btn"><input type="checkbox" class="disease-item" id="d16" value="消化性潰瘍"><label for="d16" class="checkbox-label">消化性潰瘍</label></div>
+      <div class="checkbox-btn" style="grid-column: span 2;"><input type="checkbox" class="disease-item" id="d17" value="功能性腸胃問題"><label for="d17" class="checkbox-label">功能性腸胃問題</label></div>
+    </div>
+  </div>
+
+  <!-- 第二部分：家族病史與過敏 -->
+  <div class="card">
+    <h2>二、 家族病史與過敏</h2>
+    <div class="form-group">
+      <label for="familyHistory">家族病史：</label>
+      <input type="text" id="familyHistory" placeholder="例：父親高血壓、媽媽痛風（若無填不知）">
+    </div>
+    <div class="form-group">
+      <label for="foodAllergy">食物過敏：</label>
+      <input type="text" id="foodAllergy" placeholder="若無請填無">
+    </div>
+    <div class="form-group">
+      <label for="drugAllergy">藥物過敏：</label>
+      <input type="text" id="drugAllergy" placeholder="若無請填無">
+    </div>
+  </div>
+
+  <!-- 第三部分：身體數據 -->
+  <div class="card">
+    <h2>三、 身體數據 (可選擇填寫)</h2>
+    <div class="form-group">
+      <label>身高與體重：</label>
+      <div class="unit-input" style="margin-bottom: 8px;">
+        <input type="number" id="height" placeholder="身高" inputmode="decimal"><span class="unit-text">cm</span>
+      </div>
+      <div class="unit-input">
+        <input type="number" id="weight" placeholder="體重" inputmode="decimal"><span class="unit-text">kg</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="waist">腰圍：</label>
+      <div class="unit-input">
+        <input type="number" id="waist" placeholder="腰圍" inputmode="decimal"><span class="unit-text">cm</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>血壓與脈搏：</label>
+      <div class="unit-input" style="margin-bottom: 8px;">
+        <input type="number" id="sbp" placeholder="收縮壓(高壓)" inputmode="numeric">
+        <span class="unit-text">/</span>
+        <input type="number" id="dbp" placeholder="舒張壓(低壓)" inputmode="numeric">
+        <span class="unit-text">mmHg</span>
+      </div>
+      <div class="unit-input">
+        <input type="number" id="pulse" placeholder="脈搏" inputmode="numeric"><span class="unit-text">次/分</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 提交按鈕 -->
+  <button class="submit-btn" onclick="submitData()">填好了，點此送出 ➔</button>
+
+  <script>
+    // 初始化 LINE LIFF
+    window.onload = function() {
+      // 請填入您在 LINE Developers 申請到的 LIFF ID
+      liff.init({ liffId: "YOUR_LIFF_ID_HERE" }).catch(err => console.error(err));
+    };
+
+    // 點選「以上皆無」時取消其他勾選
+    function toggleNone(noneCheckbox) {
+      if (noneCheckbox.checked) {
+        document.querySelectorAll('.disease-item').forEach(cb => cb.checked = false);
+      }
+    }
+
+    // 點選其他疾病時，自動取消「以上皆無」
+    document.querySelectorAll('.disease-item').forEach(cb => {
+      cb.addEventListener('change', () => {
+        if (cb.checked) {
+          document.getElementById('disease-0').checked = false;
+        }
+      });
+    });
+
+    // 提交數據邏輯
+    function submitData() {
+      // 1. 收集疾病
+      let selectedDiseases = [];
+      if (document.getElementById('disease-0').checked) {
+        selectedDiseases.push("無");
+      } else {
+        document.querySelectorAll('.disease-item:checked').forEach(cb => {
+          selectedDiseases.push(cb.value);
+        });
+      }
+      let diseaseText = selectedDiseases.length > 0 ? selectedDiseases.join(', ') : "未填寫";
+
+      // 2. 收集其他欄位
+      let family = document.getElementById('familyHistory').value || "無";
+      let food = document.getElementById('foodAllergy').value || "無";
+      let drug = document.getElementById('drugAllergy').value || "無";
+      let height = document.getElementById('height').value || "-";
+      let weight = document.getElementById('weight').value || "-";
+      let waist = document.getElementById('waist').value || "-";
+      let sbp = document.getElementById('sbp').value || "-";
+      let dbp = document.getElementById('dbp').value || "-";
+      let pulse = document.getElementById('pulse').value || "-";
+
+      // 3. 組合要發送給 LINE 聊天室的文字格式
+      let msgText = `【健康資料填寫完成】\n` +
+                    `1. 本人病史：${diseaseText}\n` +
+                    `2. 家族病史：${family}\n` +
+                    `3. 食物過敏：${food} / 藥物過敏：${drug}\n` +
+                    `4. 身高體重：${height}cm / ${weight}kg\n` +
+                    `5. 腰圍：${waist}cm\n` +
+                    `6. 血壓脈搏：${sbp}/${dbp} mmHg，脈搏 ${pulse}次/分`;
+
+      // 4. 透過 LIFF 回傳訊息給 LINE 聊天室並關閉網頁
+      if (liff.isLoggedIn()) {
+        liff.sendMessages([{
+          type: 'text',
+          text: msgText
+        }]).then(() => {
+          alert('資料已成功送出！');
+          liff.closeWindow(); // 關閉 LIFF 視窗
+        }).catch((err) => {
+          alert('發送失敗，請直接截圖畫面傳給我們：' + err.message);
+        });
+      } else {
+        alert("格式預覽：\n" + msgText);
+      }
+    }
+  </script>
+</body>
+</html>
