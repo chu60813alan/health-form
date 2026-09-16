@@ -285,7 +285,7 @@
                     `6. 血壓脈搏：${sbp}/${dbp} mmHg，脈搏 ${pulse}次/分`;
 
       // 4. 透過 LIFF 回傳訊息給 LINE 聊天室並關閉網頁
-      if (liff.isLoggedIn()) {
+     if (liff.isInClient()) {
         liff.sendMessages([{
           type: 'text',
           text: msgText
