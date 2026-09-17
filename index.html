@@ -214,10 +214,16 @@
         if (!liff.isLoggedIn()) {
           liff.login();
         } else {
-          liff.sendMessages([{
-            type: 'text',
-            text: msgText
-          }]).then(() => {
+         liff.sendMessages([
+            {
+              type: 'text',
+              text: '【健康資料填寫完成】'
+            },
+            {
+              type: 'text',
+              text: msgText
+            }
+          ]).then(() => {
             alert('資料已成功送出！');
             liff.closeWindow(); // 自動關閉 LIFF 網頁
           }).catch((err) => {
