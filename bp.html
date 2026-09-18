@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>每日血壓記錄</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background-color: #f4f6f9;
+      margin: 0;
+      padding: 20px;
+      color: #333;
+    }
+    .card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    h2 {
+      text-align: center;
+      color: #0056b3;
+      font-size: 26px;
+      margin-top: 0;
+      margin-bottom: 20px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #444;
+    }
+    input[type="number"] {
+      width: 100%;
+      height: 56px;
+      font-size: 28px;
+      font-weight: bold;
+      text-align: center;
+      border: 2px solid #ccc;
+      border-radius: 10px;
+      box-sizing: border-box;
+      outline: none;
+    }
+    input[type="number"]:focus {
+      border-color: #28a745;
+      background-color: #f0fff4;
+    }
+    .unit {
+      font-size: 16px;
+      color: #666;
+      font-weight: normal;
+    }
+    .btn-submit {
+      width: 100%;
+      height: 60px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 10px;
+      box-shadow: 0 4px 6px rgba(40, 167, 69, 0.3);
+    }
+    .btn-submit:active {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <h2>❤️ 博仁醫院每日血壓記錄</h2>
+  
+  <form id="bpForm">
+    <div class="form-group">
+      <label for="sys">收縮壓 (高的數字) <span class="unit">mmHg</span></label>
+      <input type="number" id="sys" placeholder="例如：120" inputmode="numeric" required>
+    </div>
+
+    <div class="form-group">
+      <label for="dia">舒張壓 (低的數字) <span class="unit">mmHg</span></label>
+      <input type="number" id="dia" placeholder="例如：80" inputmode="numeric" required>
+    </div>
+
+    <div class="form-group">
+      <label for="pulse">心跳 (每分鐘) <span class="unit">次</span></label>
+      <input type="number" id="pulse" placeholder="例如：72" inputmode="numeric" required>
+    </div>
+
+    <button type="submit" class="btn-submit">填好了，點此送出 ✉️</button>
+  </form>
+</div>
+
+<script>
+  async function main() {
+    // 💡 記得把 YOUR_LIFF_ID 換成您在 LINE Developers 申請的真實 LIFF ID
+    await liff.init({ liffId: "YOUR_LIFF_ID" });
+  }
+  main();
+
+  document.getElementById('bpForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+
+    const sys = document.getElementById('sys').value;
+    const dia = document.getElementById('dia').value;
+    const pulse = document.getElementById('pulse').value;
+
+    const messageText = `❤️【每日血壓登記】\n` +
+                        `• 收縮壓：${sys} mmHg\n` +
+                        `• 舒張壓：${dia} mmHg\n` +
+                        `• 心跳：${pulse} 次/分\n` +
+                        `• 記錄時間：${new Date().toLocaleString('zh-TW', { hour12: false })}`;
+
+    if (liff.isLoggedIn()) {
+      liff.sendMessages([{
+        type: 'text',
+        text: messageText
+      }]).then(() => {
+        liff.closeWindow();
+      }).catch((err) => {
+        alert('發送失敗：' + err);
+      });
+    } else {
+      alert(messageText);
+    }
+  });
+</script>
+
+</body>
+</html>
